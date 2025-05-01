@@ -105,6 +105,13 @@ const Dashboard: React.FC = () => {
         {statuses.map((status) => (
           <Box
             key={status}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={async (e) => {
+              const taskId = e.dataTransfer.getData("taskId");
+              await updateTaskStatus(taskId, status);
+              const updatedTasks = await getAllProjectTasks(selectedProject!);
+              setTasks(updatedTasks);
+            }}
             sx={{
               width: "30%",
               bgcolor: "#f5f5f5",
@@ -129,9 +136,12 @@ const Dashboard: React.FC = () => {
                 .map((task) => (
                   <Card
                     key={task._id}
-                    variant="outlined"
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData("taskId", task._id);
+                    }}
                     onClick={() => handleTaskClick(task)}
-                    sx={{ cursor: "pointer" }}
+                    sx={{ cursor: "grab" }}
                   >
                     <CardContent>
                       <Typography variant="subtitle1" fontWeight="bold">
